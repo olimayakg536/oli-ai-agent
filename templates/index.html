@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oli - Interactive AI Agent</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body data-theme="light">
+  <div class="app-container">
+    <!-- Header -->
+    <header class="chat-header">
+      <div class="header-branding">
+        <div class="avatar-logo">O</div>
+        <div class="header-text">
+          <div class="title-row">
+            <h1 class="agent-title">Oli</h1>
+            <span class="agent-tag">Interactive Agent</span>
+          </div>
+          <p class="agent-subtitle">Your Autonomous AI Assistant</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <!-- Theme Toggle -->
+        <button id="themeToggleBtn" class="icon-action-btn" title="Toggle Light/Dark Theme" aria-label="Toggle Theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+        <!-- Export Chat -->
+        <button id="exportBtn" class="icon-action-btn" title="Export Chat Transcript" aria-label="Export Chat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </button>
+        <!-- New Chat Reset -->
+        <button id="resetBtn" class="reset-button" title="Clear conversation memory" aria-label="Reset Conversation">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
+          <span>New Chat</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Error Banner -->
+    <div id="errorBanner" class="error-banner hidden">
+      <span id="errorMessage"></span>
+      <button id="dismissError" class="dismiss-btn">&times;</button>
+    </div>
+
+    <!-- Chat Messages Window -->
+    <main class="chat-main" id="chatContainer">
+      <!-- Welcome Intro Box -->
+      <div class="welcome-card" id="welcomeCard">
+        <div class="welcome-avatar">O</div>
+        <h2>Hello, I'm Oli!</h2>
+        <p>I'm your interactive AI agent equipped with autonomous tools, multi-step reasoning, voice capabilities, and live knowledge retrieval.</p>
+        
+        <!-- Category Tabs -->
+        <div class="category-tabs" id="categoryTabs">
+          <button class="cat-tab active" data-cat="all">✨ All</button>
+          <button class="cat-tab" data-cat="math">🧮 Math</button>
+          <button class="cat-tab" data-cat="knowledge">🌐 Knowledge</button>
+          <button class="cat-tab" data-cat="converter">🔄 Converter</button>
+          <button class="cat-tab" data-cat="productivity">📝 Notes &amp; Tasks</button>
+        </div>
+
+        <div class="suggestion-section">
+          <div class="chip-container" id="chipContainer">
+            <!-- Dynamic Category Chips -->
+            <button class="chip-btn" data-cat="math" data-prompt="What is 25 + 50?">🧮 What is 25 + 50?</button>
+            <button class="chip-btn" data-cat="math" data-prompt="Calculate 2^10">⚡ Calculate 2^10</button>
+            <button class="chip-btn" data-cat="knowledge" data-prompt="Who is Alan Turing?">🌐 Who is Alan Turing?</button>
+            <button class="chip-btn" data-cat="knowledge" data-prompt="What is Quantum Computing?">🔬 What is Quantum Computing?</button>
+            <button class="chip-btn" data-cat="converter" data-prompt="Convert 100 km to miles">🔄 100 km to miles</button>
+            <button class="chip-btn" data-cat="converter" data-prompt="Convert 30 C to F">🌡️ 30 C to F</button>
+            <button class="chip-btn" data-cat="productivity" data-prompt="Save note: Review AI Agent architecture">📝 Save note: Review AI Agent</button>
+            <button class="chip-btn" data-cat="productivity" data-prompt="Show my notes">📋 Show my notes</button>
+            <button class="chip-btn" data-cat="productivity" data-prompt="Add task: Deploy to Vercel">✅ Add task: Deploy to Vercel</button>
+            <button class="chip-btn" data-cat="all" data-prompt="What is today's date and time?">🕒 What is today's date &amp; time?</button>
+            <button class="chip-btn" data-cat="all" data-prompt="My name is Alex.">👋 My name is Alex.</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages List -->
+      <div id="messagesList" class="messages-list"></div>
+
+      <!-- Typing Indicator -->
+      <div id="typingIndicator" class="typing-indicator hidden">
+        <div class="avatar-small">O</div>
+        <div class="typing-bubble">
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+          <span class="typing-label" id="typingLabel">Oli is thinking...</span>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Input Bar -->
+    <footer class="chat-footer">
+      <form id="chatForm" class="chat-form">
+        <div class="input-wrapper">
+          <input 
+            type="text" 
+            id="messageInput" 
+            class="message-input" 
+            placeholder="Ask Oli, solve math, convert units, search knowledge, or record notes..." 
+            autocomplete="off"
+            required
+          />
+          <!-- Voice Dictation Button -->
+          <button type="button" id="micBtn" class="mic-btn" title="Voice Input (Speech-to-Text)" aria-label="Speak">
+            <svg class="mic-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+          </button>
+        </div>
+        <button type="submit" id="sendBtn" class="send-btn" aria-label="Send Message">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          <span class="send-btn-text">Send</span>
+        </button>
+      </form>
+      <div class="input-hint">
+        <span>Press <kbd>Enter</kbd> to send</span> &bull; 
+        <span>Voice Enabled 🎙️</span> &bull; 
+        <span>Multi-Step Agent Reasoning 🧠</span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
