@@ -216,3 +216,9 @@ PORT=5000
 Oli is designed with **defensive architecture**:
 - If an LLM API quota limit (429) is encountered or no API key is provided, Oli **never crashes**.
 - It gracefully falls back to its local tool synthesis engine, allowing calculations, unit conversions, Wikipedia lookups, task management, and session memory to continue working seamlessly!
+
+---
+
+## 🌐 Live Demo
+
+**[Click here to visit the live website](https://oli-ai-agent.vercel.app/)**
